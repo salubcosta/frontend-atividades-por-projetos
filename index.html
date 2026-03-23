@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atividades por Projetos</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+
+    <!-- Fontes do google - ROBOTO -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1 class="title">Gerenciamento de atividades por <span class="title-projetos">Projetos</span></h1>
+    </header>
+    <main class="container">
+        <section class="operacoes">
+            <button class="btn-operacoes ativo" id="cat" onclick="navegar('cat')">Categorias</button>
+            <button class="btn-operacoes" id="pro" onclick="navegar('pro')">Projetos</button>
+            <button class="btn-operacoes" id="ati" onclick="navegar('ati')">Atividades</button>
+        </section>
+
+        <!-- Seção de categoria -->
+        <section id="secao-categorias" class="secao ativa-secao">
+            <div class="secao-header">
+                <span class="secao-titulo">Categorias</span>
+                <button class="btn-adicionar" onclick="renderizar('form-categoria')">Adicionar categoria</button>
+            </div>
+            <div id="lista-categorias">
+                <!-- tabela será carregada pelo JS -->
+            </div>
+            <div id="adicionar-editar-categoria" hidden="false">
+            </div>
+        </section>
+                
+        <!-- Seção de Projetos -->
+        <section id="secao-projetos" class="secao">
+            <div class="secao-header">
+                <span class="secao-titulo">Projetos</span>
+                <button class="btn-adicionar" onclick="renderizar('form-projeto')">Adicionar projetos</button>
+            </div>
+            <div id="lista-projetos">
+                <!-- tabela será carregada pelo JS -->
+            </div>
+            <div id="adicionar-editar-projeto" hidden="false">
+            </div>
+        </section>
+        
+        <!-- Seção de Atividades -->
+        <section id="secao-atividades" class="secao">
+            <div class="secao-header">
+                <span class="secao-titulo">Atividades</span>
+                <button class="btn-adicionar">Adicionar atividades</button>
+            </div>
+            <div id="lista-atividades">
+                <!-- tabela será carregada pelo JS -->
+            </div>
+        </section>
+
+        <!-- Feedback -->
+        <div id="feedback">
+        </div>
+    </main>
+    <script src="./assets/js/scripts.js"></script>
+</body>
+</html>
