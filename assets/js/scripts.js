@@ -84,8 +84,6 @@ const popular_categoria = () => {
                 `).join('')}
             </tbody>
         </table>
-        <span id="alerta"></span>
-        <span id="sucesso"></span>
         `
     }
     document.getElementById("lista-categorias").hidden = false
