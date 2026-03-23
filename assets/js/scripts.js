@@ -354,6 +354,7 @@ const excluir_categoria = (botao, id) => {
     elementos_excluir = document.getElementsByClassName("btn-excluir")
     for(let i = 0; i < elementos_excluir.length; i++){
         elementos_excluir[i].innerText = "Excluir"
+        elementos_excluir[i].dataset.confirmando = "false";
     }
     elementos_cancelar = document.getElementsByClassName("btn-cancelar-exclusao")
     for(let i = 0; i < elementos_cancelar.length; i++){
@@ -361,6 +362,7 @@ const excluir_categoria = (botao, id) => {
     }
     
     botao.innerText = "Excluir❔"
+    botao.dataset.confirmando = "true";
 
     let btn_cancelar = botao.parentElement.querySelector(".btn-cancelar-exclusao");
 
@@ -374,20 +376,32 @@ const excluir_categoria = (botao, id) => {
         btn_cancelar.hidden = false
     }
 
-    btn_cancelar.onclick = () => cancelar_exclusao("cat")
+    btn_cancelar.onclick = () => cancelar_exclusao()
 
     botao.onclick = () => {
-        if (botao.innerText != "Excluir")
-            deletar_categoria(id)
-        else {
-            excluir_categoria(botao, id)
+        if (botao.dataset.confirmando === "true") {
+            deletar_categoria(id);
+        } else {
+            excluir_categoria(botao, id);
         }
     }
     
 }
 
-const cancelar_exclusao = (target) => {
-    navegar(target)
+const cancelar_exclusao = (target = null) => {
+    if (target) {
+        navegar(target); 
+        return;
+    }
+
+    document.querySelectorAll(".btn-excluir").forEach(btn => {
+        btn.innerText = "Excluir";
+        btn.dataset.confirmando = "false";
+    });
+
+    document.querySelectorAll(".btn-cancelar-exclusao").forEach(btn => {
+        btn.remove();
+    });
 }
 
 const deletar_categoria = (id) => {
@@ -479,6 +493,7 @@ const excluir_projeto = (botao, id) => {
     elementos_excluir = document.getElementsByClassName("btn-excluir")
     for(let i = 0; i < elementos_excluir.length; i++){
         elementos_excluir[i].innerText = "Excluir"
+        elementos_excluir[i].dataset.confirmando = "false";
     }
     elementos_cancelar = document.getElementsByClassName("btn-cancelar-exclusao")
     for(let i = 0; i < elementos_cancelar.length; i++){
@@ -486,6 +501,7 @@ const excluir_projeto = (botao, id) => {
     }
     
     botao.innerText = "Excluir❔"
+    botao.dataset.confirmando = "true";
 
     let btn_cancelar = botao.parentElement.querySelector(".btn-cancelar-exclusao");
 
@@ -499,12 +515,12 @@ const excluir_projeto = (botao, id) => {
         btn_cancelar.hidden = false
     }
 
-    btn_cancelar.onclick = () => cancelar_exclusao("pro")
+    btn_cancelar.onclick = () => cancelar_exclusao()
 
     botao.onclick = () => {
-        if (botao.innerText != "Excluir")
+        if (botao.dataset.confirmando === "true") {
             deletar_projeto(id)
-        else {
+        } else {
             excluir_projeto(botao, id)
         }
     }
