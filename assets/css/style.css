@@ -36,6 +36,7 @@ header{
     background-color: #ccc;
     width: 80%;
     min-height: 300px;
+    max-width: 1444px;
     border-radius: 30px;
     margin: -30px auto;
     padding: 30px;
@@ -138,7 +139,10 @@ tbody tr:hover{
 tbody td {
     padding: 12px 16px;
 }
-
+td:nth-child(2), th:nth-child(2) {
+    width: 60%;
+    word-wrap: break-word;
+}
 .td-acoes {
     display: flex;
     width: 225px;
@@ -240,15 +244,3 @@ tbody td {
     border-radius: 10px;
     margin-top: 5px;
 }
-
-/* #alerta {
-    color: #c0392b;
-    font-weight: 500;
-    font-size: 13px;
-}
-
-#sucesso {
-    color: darkgreen;
-    font-weight: 500;
-    font-size: 13px;
-} */
