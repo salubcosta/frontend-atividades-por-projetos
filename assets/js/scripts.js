@@ -1,6 +1,6 @@
 /*
   --------------------------------------------------------------------------------------
-  Lista de Categorias, Projetos e Atividades em memória
+  Lista de [Categorias, Projetos e Registros em memória] e URL Padrão do Backend
   --------------------------------------------------------------------------------------
 */
 let lista = [];
@@ -15,16 +15,17 @@ function navegar(id){
     document.querySelectorAll('.btn-operacoes').forEach(s => s.classList.remove('ativo'))
     document.getElementById(id).classList.add('ativo')
     
-    if (id == "cat") carregarSecao("categorias")
-    if (id == "pro") carregarSecao("projetos")
-    if (id == "ati") carregarSecao("atividades")
+    if (id == "cat") carregarSecao("categorias");
+    else if (id == "pro") carregarSecao("projetos");
+    else if (id == "ati") carregarSecao("registros");
 }
 
 function carregarSecao(secao){
     document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa-secao'))
     document.getElementById("secao-"+secao).classList.add("ativa-secao")
-    if (secao == "categorias") carregar_dados(secao)
-    if (secao == "projetos") carregar_dados(secao)
+    if (secao == "categorias") carregar_dados(secao);
+    else if (secao == "projetos") carregar_dados(secao);
+    else if (secao == "registros") carregar_dados(secao, null);
 }
 
 /*
@@ -33,31 +34,75 @@ function carregarSecao(secao){
   --------------------------------------------------------------------------------------
 */
 
-const carregar_dados = async (target) => {
-    let url = `${URL_API}${target}`;
-    fetch(url, {method: 'get'})
-    .then((response) => response.json())
-    .then((data) =>{
-        lista = data
-        if (target == "categorias") popular_categoria()
-        if (target == "projetos") popular_projetos()
-        console.log(lista)
-    })
+const carregar_dados = async (target, key_projeto = null) => {
+    limpar_feedback()
+    if(key_projeto){
+        key_projeto = document.getElementById(key_projeto).value;
+        if(!key_projeto){
+            feedback("Selecione um projeto.", "alerta");
+            return;
+        }
+    }
+    let url = (key_projeto == null) ? `${URL_API}${target}`: `${URL_API}${target}/projeto/${key_projeto}`;
+    
+    if(target == "registros" && key_projeto == null){
+        // Carregar combo com os projetos
+        carregar_combo_projetos()
+    } else {
+        // Carregamento de dados
+        fetch(url, {method: 'get'})
+        .then((response) => response.json())
+        .then((data) =>{
+            lista = data
+            if (target == "categorias") popular_categoria();
+            else if (target == "projetos") popular_projetos();
+            else if (target == "registros") popular_registros();
+        }).catch(error => {
+            feedback(`Servidor não está respondendo. Erro: ${error}`,"alerta", null, 10000)
+        })
+    }
 }
 
-// const carregar_dados_categorias =  (target) => {
-//      let url = `${URL_API}${target}`;
-//     fetch(url, {method: 'get'})
-//     .then((response) => response.json())
-//     .then((data) =>{
-//         _lista_categorias = data
-//     })
-// }
+const carregar_combo_projetos =  () => {
+    let url = `${URL_API}projetos/`
+    fetch(url, {method: 'get'})
+        .then((response) => response.json())
+        .then((data) =>{
+            lista = data
+
+            if(!lista || lista.projetos.length == 0){
+                elemento = document.getElementById("lista-registros");
+                elemento.hidden = false;
+                elemento.innerHTML = "Não há nenhum projeto cadastro.";
+                return;
+            }
+
+            projetos = document.getElementById("selecione-projeto")
+            projetos.innerHTML = `
+            <div class="form-grupo">
+                <label class="form-label" for="select-projeto">Projetos</label>
+                <select class="form-input" id="select-projeto">
+                    <option value="">Selecione...</option>
+                    ${data.projetos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('')}
+                </select>
+            </div>
+            <div class="td-acoes" style="margin-top:15px">
+                <button class="btn-salvar" onclick="carregar_dados('registros','select-projeto')">Ver registros</button>
+            </div>
+            `     
+            projetos.hidden = false;    
+        }).catch(error => {
+            feedback(`Backend não está respondendo... Erro: ${error}`,"alerta", null, 10000)
+        });
+
+        document.getElementById("lista-registros").hidden = true;
+        document.getElementById("adicionar-editar-registro").hidden = true;
+}
 
 const popular_categoria = () => {
     elemento = document.getElementById("lista-categorias")
 
-    if(!lista || lista.length == 0){
+    if(!lista || lista.categorias.length == 0){
         elemento.innerHTML = "Nenhuma categoria encontrada."
     } else {
         elemento.innerHTML = `
@@ -93,7 +138,7 @@ const popular_categoria = () => {
 const popular_projetos = () => {
     elemento = document.getElementById("lista-projetos")
 
-    if(!lista || lista.length == 0){
+    if(!lista || lista.projetos.length == 0){
         elemento.innerHTML = "Nenhuma projeto encontrado."
     } else {
         elemento.innerHTML = `
@@ -127,6 +172,53 @@ const popular_projetos = () => {
     document.getElementById("adicionar-editar-projeto").hidden = true
 }
 
+const popular_registros = () => {
+    elemento = document.getElementById("lista-registros")
+    
+    if(!lista || lista.registros.length == 0){
+        elemento.innerHTML = "<br>Nenhuma registro encontrado para esse projeto."
+    } else {
+        elemento.innerHTML = `
+        <table style="margin-top:15px">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Descrição</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${lista.registros.map(registro =>`
+                    <tr>
+                        <td>${formatar_data(registro.data)}</td>
+                        <td>${registro.descricao}</td>
+                        <td>
+                            <div class="td-acoes">
+                                <button class="btn-editar" onclick="gerar_form_para_put('registros', ${registro.id})">Editar</button>
+                                <button class="btn-excluir" onclick="excluir_registro(this, ${registro.id})">Excluir</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>`
+    }
+    document.getElementById("lista-registros").hidden = false;
+    document.getElementById("adicionar-editar-registro").hidden = true;
+
+}
+
+const formatar_data = (str) => {
+    if(!str) return '-';
+    try {
+        const data = new Date(str);
+        data.setHours(data.getHours() + 3); // UTC - Brasília
+        return data.toLocaleDateString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+    } catch { return str; }
+}
 
 const renderizar = (target) => {
     limpar_feedback()
@@ -150,6 +242,16 @@ const renderizar = (target) => {
         document.getElementById("lista-projetos").hidden = false
         document.getElementById("adicionar-editar-projeto").hidden = true
     }
+    if (target == "lista-registros") {
+        carregar_dados("registros")
+        document.getElementById("adicionar-editar-registro").hidden = true
+    }
+    if (target == "form-registros") {
+        gerar_form_para_post("registros");
+        document.getElementById("selecione-projeto").hidden = true
+        document.getElementById("lista-registros").hidden = true
+        document.getElementById("adicionar-editar-registro").hidden = false
+    }
 }
 
 const gerar_form_para_post = (target) => {
@@ -171,7 +273,6 @@ const gerar_form_para_post = (target) => {
         `
     }
     if (target == "projetos"){
-        _lista_categorias = []
         let url = `${URL_API}categorias`;
         fetch(url, {method: 'get'})
         .then((response) => response.json())
@@ -204,6 +305,42 @@ const gerar_form_para_post = (target) => {
             </section>
             `
         })
+    }
+    if (target == "registros") {
+        let url = `${URL_API}projetos/`
+       
+        fetch(url, {method: 'get'})
+        .then((response) => response.json())
+        .then((data) =>{
+            lista = data
+            console.log(data)
+            elemento = document.getElementById("adicionar-editar-registro")
+            elemento.innerHTML = `
+            <section class="form-adicionar-editar">
+                <div class="form-grupo">
+                    <label class="form-label" for="projeto">Projetos</label>
+                    <select class="form-input" id="projeto">
+                        <option value="">Selecione...</option>
+                        ${data.projetos.map(p => `<option value="${p.id}">${p.nome}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="form-grupo">
+                    <label class="form-label" for="descricao_registro">Descricao</label>
+                    <textarea class="form-input" rows="3" name="descricao_registro" id="descricao_registro"></textarea>
+                </div>
+                <div class="form-acoes">
+                    <button class="btn-cancelar" onclick="renderizar('lista-registros')">Cancelar</button>
+                    <button class="btn-salvar" onclick="salvar_novo_registro()">Salvar</button>
+                </div>
+                
+            </section>
+            `;      
+                
+        }).catch(error => {
+            feedback(`Backend não está respondendo... Erro: ${error}`,"alerta", null, 10000)
+        });
+        
+        
     }
 }
 const gerar_form_para_put = (target, id) => {
@@ -274,6 +411,41 @@ const gerar_form_para_put = (target, id) => {
         document.getElementById("lista-projetos").hidden = true
         document.getElementById("adicionar-editar-projeto").hidden = false
     }
+    if (target == "registros"){
+        
+        projetos = document.getElementById("selecione-projeto");
+        
+        projetos.hidden = true;
+
+        const registro = lista.registros.find(r => r.id == id)
+
+        elemento = document.getElementById("adicionar-editar-registro")
+        elemento.innerHTML = 
+        `
+        <section class="form-adicionar-editar">
+        <div class="form-grupo">
+            <label class="form-label" for="projeto">Projeto</label>
+            <input type="text" class="form-input" name="projeto" id="projeto" readonly value="${registro.projeto.nome}"">
+        </div>
+        <hr style="margin-top:15px;border: 1px solid #ccc;">
+        <div class="form-grupo">
+            <label class="form-label" for="id_registro">ID</label>
+            <input type="text" class="form-input" name="id_registro" id="id_registro" readonly value="${registro.id}"">
+        </div>
+        <div class="form-grupo">
+            <label class="form-label" for="descricao_registro">Descricao</label>
+            <textarea rows="3" class="form-input" name="descricao_registro" id="descricao_registro">${registro.descricao}</textarea>
+        </div>
+        <div class="form-acoes">
+            <button class="btn-cancelar" onclick="renderizar('lista-registros')">Cancelar</button>
+            <button class="btn-salvar" onclick="editar_registro()">Salvar</button>
+        </div>
+            
+        </section>
+        `
+        document.getElementById("lista-registros").hidden = true
+        document.getElementById("adicionar-editar-registro").hidden = false
+    }
 }
 
 const salvar_nova_categoria = () => {
@@ -325,7 +497,8 @@ const editar_categoria = () => {
 const limpar_feedback = () => {
     document.getElementById("feedback").innerText = ""
 }
-const feedback = (msg, tipo, recarregar = null) => {
+
+const feedback = (msg, tipo, recarregar = null, tempo = null) => {
     const elemento = document.getElementById("feedback");
 
     if (!elemento) return;
@@ -333,8 +506,8 @@ const feedback = (msg, tipo, recarregar = null) => {
     elemento.innerText = msg;
     elemento.style.color = tipo === "sucesso" ? "green" : "red";
 
-    const tempo = tipo === "sucesso" ? 1500 : 2000;
-
+    tempo = tempo || (tipo === "sucesso" ? 1500 : 2000);
+    
     setTimeout(() => {
         elemento.innerText = "";
 
@@ -343,6 +516,9 @@ const feedback = (msg, tipo, recarregar = null) => {
         }
         if (recarregar === "recarregar_pro") {
             navegar("pro");
+        }
+        if (recarregar === "recarregar_ati") {
+            navegar("ati");
         }
     }, tempo);
 };
@@ -410,14 +586,13 @@ const deletar_categoria = (id) => {
     })
     .then((response) => response.json())
     .then((data) =>{
+        console.log(data);
         if(data.erro)
-            feedback(data.erro, "alerta")
+            feedback(data.erro, "alerta", "recarregar_cat", 4500);
         else
-            feedback(`${data.mensagem}.`, "sucesso")
-        setTimeout(() => {
-            navegar("cat")
-        }, 1500);
+            feedback(`${data.mensagem}.`, "sucesso", "recarregar_cat");
     }).catch((erro)=> {
+        feedback(erro, "alerta", "recarregar_cat", 4500);
     });
 }
 
@@ -455,7 +630,7 @@ const salvar_novo_projeto = () => {
     }).catch((erro)=> {
         feedback("Erro: " + erro, "alerta")
     });
-}
+};
 
 const editar_projeto = () => {
     const id = document.getElementById("id_projeto").value.trim();
@@ -522,7 +697,7 @@ const excluir_projeto = (botao, id) => {
             excluir_projeto(botao, id)
         }
     }
-}
+};
 
 const deletar_projeto = (id) => {
     let url = URL_API+"projetos/" + id;
@@ -541,4 +716,115 @@ const deletar_projeto = (id) => {
         }, 1500);
     }).catch((erro)=> {
     });
-}
+};
+
+// REGISTRO / ATIVIDADES ############
+
+const salvar_novo_registro = () => {
+    const projeto_id = document.getElementById("projeto").value.trim();
+    const descricao = document.getElementById("descricao_registro").value.trim();
+    
+    console.log("projeto_id: "+projeto_id);
+    console.log("descricao_registro: "+descricao);
+    
+    if(!projeto_id || projeto_id.length == 0) { feedback("* Selecione algum projeto", "alerta"); return;}
+    if(!descricao || descricao.length == 0) { feedback("* Informe a descrição", "alerta"); return;}
+    
+    let url = URL_API+"registros/";
+    const form = new FormData();
+    form.append("descricao", descricao);
+    form.append("projeto_id", projeto_id);
+
+    fetch(url, {
+        method: 'post',
+        body: form
+    })
+    .then((response) => response.json())
+    .then((data) =>{
+        feedback("Registrado.", "sucesso")
+        setTimeout(() => {
+            navegar("ati")
+        }, 1500);
+    }).catch((erro)=> {
+        feedback("Erro: " + erro, "alerta")
+    });
+};
+
+const editar_registro = () => {
+    const id = document.getElementById("id_registro").value.trim();
+    const descricao = document.getElementById("descricao_registro").value.trim();
+    console.log("id:"+id);
+    console.log("descricao_registro:"+descricao);
+        
+    if(!id || id.length == 0) { feedback("* É necessário ter o ID da atividade/registro", "alerta", null, 4000); return;}
+    if(!descricao || descricao.length == 0) { feedback("* Informe a descrição", "alerta"); return;}
+        
+    let url = URL_API+"registros/"+id;
+    method = 'put'
+    const opts = { method, headers: {'Content-Type': 'application/json'}}
+    
+    opts.body = JSON.stringify({id, descricao})
+
+    fetch(url, opts)
+    .then((response) => response.json())
+    .then((data) =>{
+        feedback("Atualizado.", "sucesso", "recarregar_ati")
+    }).catch((erro)=> {
+        feedback("Erro: " + erro, "alerta")
+    });
+};
+
+const excluir_registro= (botao, id) => {
+    
+    elementos_excluir = document.getElementsByClassName("btn-excluir")
+    for(let i = 0; i < elementos_excluir.length; i++){
+        elementos_excluir[i].innerText = "Excluir"
+        elementos_excluir[i].dataset.confirmando = "false";
+    }
+    elementos_cancelar = document.getElementsByClassName("btn-cancelar-exclusao")
+    for(let i = 0; i < elementos_cancelar.length; i++){
+        elementos_cancelar[i].hidden = true
+    }
+    
+    botao.innerText = "Excluir❔"
+    botao.dataset.confirmando = "true";
+
+    let btn_cancelar = botao.parentElement.querySelector(".btn-cancelar-exclusao");
+
+    if(!btn_cancelar){
+        btn_cancelar = document.createElement("button");
+        btn_cancelar.innerText = "Cancelar";
+        btn_cancelar.classList.add("btn-cancelar-exclusao");
+
+        botao.parentElement.appendChild(btn_cancelar)
+    } else {
+        btn_cancelar.hidden = false
+    }
+
+    btn_cancelar.onclick = () => cancelar_exclusao()
+
+    botao.onclick = () => {
+        if (botao.dataset.confirmando === "true") {
+            deletar_registro(id)
+        } else {
+            excluir_registro(botao, id)
+        }
+    }
+};
+
+const deletar_registro = (id) => {
+    let url = URL_API+"registros/" + id;
+    
+    fetch(url, {
+        method: 'delete',
+    })
+    .then((response) => response.json())
+    .then((data) =>{
+        if(data.erro)
+            feedback(data.erro, "alerta", null, 4500);
+        else
+            feedback(`${data.mensagem}.`, "sucesso", "recarregar_ati", 4500);
+    }).catch((erro)=> {
+        feedback(erro, "alerta", null, 4500)
+    });
+};
