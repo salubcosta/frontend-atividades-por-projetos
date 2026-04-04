@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Atividades por Projetos</title>
     <link rel="stylesheet" href="./assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico">
 
     <!-- Fontes do google - ROBOTO -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,6 +33,7 @@
                 <!-- tabela será carregada pelo JS -->
             </div>
             <div id="adicionar-editar-categoria" hidden="false">
+                <!-- Form para adicionar e atualizar será carregado via JS -->
             </div>
         </section>
                 
@@ -45,17 +47,24 @@
                 <!-- tabela será carregada pelo JS -->
             </div>
             <div id="adicionar-editar-projeto" hidden="false">
+                <!-- Form para adicionar e atualizar será carregado via JS -->
             </div>
         </section>
         
-        <!-- Seção de Atividades -->
-        <section id="secao-atividades" class="secao">
+        <!-- Seção de Atividades / Registros -->
+        <section id="secao-registros" class="secao">
             <div class="secao-header">
                 <span class="secao-titulo">Atividades</span>
-                <button class="btn-adicionar">Adicionar atividades</button>
+                <button class="btn-adicionar" onclick="renderizar('form-registros')">Adicionar atividades</button>
             </div>
-            <div id="lista-atividades">
+            <div id="selecione-projeto">
+                <!-- projetos são carregados via JS -->
+            </div>
+            <div id="lista-registros">
                 <!-- tabela será carregada pelo JS -->
+            </div>
+            <div id="adicionar-editar-registro" hidden="false">
+                <!-- Form para adicionar e atualizar será carregado via JS -->
             </div>
         </section>
 
