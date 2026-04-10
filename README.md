@@ -1,4 +1,4 @@
-# Frontend — Atividades por Projetos
+# Frontend - Atividades por Projetos
 
 Frontend para gerenciamento de atividades organizadas por projetos e categorias. Consome a [API REST do backend](https://github.com/salubcosta/backend-atividades-por-projetos) via `fetch` e não depende de nenhum framework ou bundler — apenas HTML, CSS e JavaScript puro.
 
