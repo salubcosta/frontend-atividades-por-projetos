@@ -1,6 +1,6 @@
 # Frontend — Gerenciamento de Atividades por Projetos
 
-Frontend para gerenciamento de atividades organizadas por projetos e categorias. Consome a [API REST do backend](../backend-atividades-por-projetos/) via `fetch` e não depende de nenhum framework ou bundler — apenas HTML, CSS e JavaScript puro.
+Frontend para gerenciamento de atividades organizadas por projetos e categorias. Consome a [API REST do backend](https://github.com/salubcosta/backend-atividades-por-projetos) via `fetch` e não depende de nenhum framework ou bundler — apenas HTML, CSS e JavaScript puro.
 
 Vale destacar, que este projeto faz parte do MVP da pós-graduação de Desenvolvimento Full Stack da PUC-Rio.
 
