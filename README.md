@@ -33,9 +33,11 @@ Este projeto está sendo desenvolvido como um MVP da Sprint 1 da Pós-graduaçã
 
 ## Como Executar
 
-### Pré-requisito
+Basta fazer o download do projeto e abrir o arquivo index.html no seu browser.
 
-O backend precisa estar rodando em `http://127.0.0.1:5000/`. Consulte o README do backend para instruções de execução.
+### Importante
+
+Para uma melhor experiência, o backend precisa estar rodando em `http://127.0.0.1:5000/`. Consulte o README do backend para instruções de execução.
 
 No entanto, é possível renderizar alguns recursos, basta abrir o arquivo index.html no browser.
 
